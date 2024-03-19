@@ -1,0 +1,80 @@
+// Library yang di panggil dalam kode program
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+// Pin sensor PIR
+#define PIR_PIN 12
+
+// Alamat I2C LCD
+#define I2C_ADDR    0x27
+#define LCD_COLUMNS 20
+#define LCD_LINES   4
+
+// Variable untuk menyimpan jumlah gerakan
+int gerakan = 0;
+
+// Inisialisasi LiquidCrystal_I2C
+LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
+
+void setup() {
+  // Digunakan untuk mengaktifkan backlight
+  lcd.backlight();
+
+  // Inisialisasi LiquidCrystal_I2C
+  lcd.init();
+
+  lcd.setCursor(3, 1);
+  lcd.print("Motion Sensor");
+  lcd.setCursor(5, 2);
+  lcd.print("Simulator");
+
+  delay(3000);
+
+  // Digunakan untuk menghapus semua karakter yang ada pada layar lcd
+  lcd.clear();
+
+  // Inisialisasi Serial
+  Serial.begin(9600);
+
+  // Set pin PIR sebagai input
+  pinMode(PIR_PIN, INPUT);
+}
+
+void loop() {
+  // Baca nilai sensor PIR
+  int nilaiSensor = digitalRead(PIR_PIN);
+
+  // Jika sensor mendeteksi gerakan
+  if (nilaiSensor == HIGH) {
+    // Menambahkan nilai gerakan
+    gerakan++;
+
+    // Menampilkan pesan gerakan terdeteksi
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Gerakan Terdeteksi!");
+    Serial.println("Gerakan Terdeteksi!");
+
+    // Menampilkan jumlah gerakan di LCD
+    lcd.setCursor(0, 1);
+    lcd.print("Jumlah Gerakan : ");
+    lcd.print(gerakan);
+    Serial.print("Jumlah Gerakan : ");
+    Serial.println(gerakan);
+
+    // Tunggu  detik
+    delay(5000);
+  }
+  else {
+    // Menampilkan pesan awal lagi setelah 0.5 detik
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Menunggu Gerakan");
+    Serial.println("Menuggu Gerakan");
+    for(int i = 1; i <= 4; i++){
+      lcd.print(".");
+      delay(500);
+    }
+    delay(100); // Tunggu 0.1 detik
+  }
+}
