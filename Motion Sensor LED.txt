@@ -1,0 +1,30 @@
+#define pirPin 2
+#define ledPin  3
+int statusPir = LOW;
+int m;
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(pirPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+  delay(1000);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  m = digitalRead(pirPin);
+  if (m == HIGH){
+    delay(500);
+    digitalWrite(ledPin, HIGH);//LED Menyala
+
+    Serial.println("Gerakkan Terdeteksi");//Serial Monitor menampilkan teks
+    statusPir = HIGH;
+  }
+  else{
+    digitalWrite(ledPin, LOW);//LED Mati
+    Serial.println("Tidak ada gerakkan");//Serial Monitor menampilkan teks
+    statusPir = LOW;
+  }
+  delay(2000);
+}
