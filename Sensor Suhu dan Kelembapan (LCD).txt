@@ -1,0 +1,54 @@
+#include <DHT.h>
+#include <LiquidCrystal.h>
+
+// Set parameter DHT
+DHT dht(4, DHT22);
+float temperature;
+float humidity;
+int counter;
+
+// Inisialisasi objek LCD
+LiquidCrystal lcd(19, 23, 18, 21, 5, 15);  // Konfigurasi pin LCD (RS, E, D4, D5, D6, D7)
+
+void setup() {
+  // Inisialisasi serial monitor
+  Serial.begin(9600);
+  Serial.println("Hello, ESP32!");
+
+  // Inisialisasi LCD
+  lcd.begin(16, 2);
+}
+
+void loop() {
+  temperature = dht.readTemperature();
+  humidity = dht.readHumidity();
+
+  Serial.println("Data: " + String(counter));
+  
+  // Cetak nilai suhu dalam Celsius ke serial monitor
+  Serial.print("Temperature (C): ");
+  Serial.println(temperature);
+  
+  // Cetak nilai suhu dalam Fahrenheit ke serial monitor
+  Serial.print("Temperature (F): ");
+  Serial.println(dht.readTemperature(true));
+  
+  // Cetak nilai kelembaban ke serial monitor
+  Serial.print("Humidity (%): ");
+  Serial.println(humidity);
+  
+  // Tampilkan data pada LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Temp: ");
+  lcd.print(temperature);
+  lcd.print("C");
+
+  lcd.setCursor(0, 1);
+  lcd.print("Humidity: ");
+  lcd.print(humidity);
+  lcd.print("%");
+
+  delay(1000); // Delay 1 detik
+  counter++;
+}

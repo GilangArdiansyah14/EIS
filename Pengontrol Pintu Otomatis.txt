@@ -1,0 +1,70 @@
+#include <ESP8266WiFi.h>
+#include <Servo.h>
+
+#define PIR_PIN D1   // Pin yang terhubung ke sensor gerak
+#define SERVO_PIN D2 // Pin yang terhubung ke motor servo
+
+const char* ssid = "nama_wifi";       // SSID WiFi Anda
+const char* password = "password_wifi"; // Password WiFi Anda
+
+Servo myServo;
+volatile bool doorOpened = false;
+
+void setup() {
+  Serial.begin(115200);
+  
+  pinMode(PIR_PIN, INPUT);
+  pinMode(SERVO_PIN, OUTPUT);
+  
+  myServo.attach(SERVO_PIN);
+  
+  // Mulai koneksi WiFi
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to WiFi..");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting...");
+  }
+  Serial.println("Connected to WiFi");
+  
+  // Mulai monitoring sensor gerak
+  attachInterrupt(digitalPinToInterrupt(PIR_PIN), motionDetected, HIGH);
+}
+
+void loop() {
+  // Tetap menjaga koneksi WiFi
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(1000);
+      Serial.println("Reconnecting...");
+    }
+    Serial.println("Reconnected to WiFi");
+  }
+  
+  // Jika pintu terbuka, tutup setelah 10 detik
+  if (doorOpened) {
+    delay(10000);
+    closeDoor();
+  }
+}
+
+// Fungsi untuk menangani deteksi gerakan
+void motionDetected() {
+  Serial.println("Motion detected!");
+  openDoor();
+}
+
+// Fungsi untuk membuka pintu
+void openDoor() {
+  myServo.write(0); // Putar servo untuk membuka pintu
+  Serial.println("Door opened");
+  doorOpened = true;
+}
+
+// Fungsi untuk menutup pintu
+void closeDoor() {
+  myServo.write(90); // Putar servo untuk menutup pintu
+  Serial.println("Door closed");
+  doorOpened = false;
+}
